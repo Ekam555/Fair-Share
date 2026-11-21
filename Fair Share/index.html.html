@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FairShare · Bill Splitter</title>
+    <meta name="description" content="A precision bill splitter web application crafted with vanilla HTML, CSS, and JavaScript. Accurately splits costs down to the penny with persistent occasion tracking." />
+    <meta property="og:title" content="FairShare · Bill Splitter" />
+    <meta property="og:description" content="A precision bill splitter web application crafted with vanilla HTML, CSS, and JavaScript. Accurately splits costs down to the penny with persistent occasion tracking." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Vanilla CSS Stylesheet -->
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Top Bar Navigation Contract -->
+    <header class="site-header">
+      <div class="header-container">
+        <!-- Zone 1: Brand Wordmark -->
+        <a href="/" class="brand-zone" aria-label="FairShare Bill Splitter Homepage">
+          <div class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <span class="brand-name">FairShare</span>
+          <span class="brand-badge">Precision Bill Splitter</span>
+        </a>
+
+        <!-- Zone 3: Storage Session Badge -->
+        <div class="header-actions">
+          <div id="sessionBadge" class="storage-badge" style="display: none;" title="Your split is automatically preserved across page refreshes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            <span>Saved on Device</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="main-wrapper">
+      <!-- Page Title & Scope -->
+      <section class="page-intro">
+        <h1 class="page-title">Split Any Bill Down to the Exact Penny</h1>
+        <p class="page-description">
+          Enter your occasion, total bill amount, and party size. FairShare automatically resolves fractional cents so the individual shares always sum exactly to your bill total.
+        </p>
+      </section>
+
+      <!-- 2-Column Splitter Grid -->
+      <div class="splitter-grid">
+        <!-- Column 1: Bill Input Panel -->
+        <section class="panel-card" id="inputPanel" aria-labelledby="formHeading">
+          <div class="panel-header">
+            <h2 class="panel-title" id="formHeading">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <line x1="6" y1="8" x2="10" y2="8"></line>
+                <line x1="6" y1="12" x2="8" y2="12"></line>
+                <line x1="6" y1="16" x2="14" y2="16"></line>
+              </svg>
+              <span>Bill Details</span>
+            </h2>
+            <span class="panel-subtitle-tag">Required inputs</span>
+          </div>
+
+          <div class="panel-body">
+            <!-- Dynamic Alert Container (Rule 4: Error messages on empty, zero, or negative inputs) -->
+            <div id="alertContainer" style="display: none;" role="alert"></div>
+
+            <form id="billSplitterForm" novalidate>
+              <div class="form-stack">
+                <!-- 1. Occasion Name -->
+                <div class="form-group">
+                  <label for="occasionInput" class="form-label">
+                    <span>Occasion Name</span>
+                    <span class="label-hint">Event or location</span>
+                  </label>
+                  <div class="input-container">
+                    <input
+                      type="text"
+                      id="occasionInput"
+                      name="occasion"
+                      class="text-input"
+                      placeholder="e.g. Dinner at Trattoria, Weekend Trip"
+                      autocomplete="off"
+                      required
+                    />
+                  </div>
+                  <!-- Quick Preset Suggestions -->
+                  <div class="presets-strip" aria-label="Quick occasion presets">
+                    <button type="button" class="preset-chip" data-occasion="Dinner & Drinks">Dinner & Drinks</button>
+                    <button type="button" class="preset-chip" data-occasion="Weekend Cabin Trip">Weekend Trip</button>
+                    <button type="button" class="preset-chip" data-occasion="Shared Groceries">Shared Groceries</button>
+                    <button type="button" class="preset-chip" data-occasion="Office Team Lunch">Team Lunch</button>
+                  </div>
+                </div>
+
+                <!-- 2. Bill Amount -->
+                <div class="form-group">
+                  <label for="billAmountInput" class="form-label">
+                    <span>Total Bill Amount</span>
+                    <span class="label-hint">Exact receipt total</span>
+                  </label>
+                  <div class="input-container">
+                    <span class="input-prefix" aria-hidden="true">$</span>
+                    <input
+                      type="number"
+                      id="billAmountInput"
+                      name="billAmount"
+                      class="text-input has-prefix"
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0.01"
+                      inputmode="decimal"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- 3. Number of People -->
+                <div class="form-group">
+                  <label for="numPeopleInput" class="form-label">
+                    <span>Number of People</span>
+                    <span class="label-hint">At least 1 person</span>
+                  </label>
+                  <div class="stepper-wrapper">
+                    <button
+                      type="button"
+                      id="btnDecrementPeople"
+                      class="stepper-btn"
+                      aria-label="Decrease number of people"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </button>
+                    <input
+                      type="number"
+                      id="numPeopleInput"
+                      name="numPeople"
+                      class="text-input people-input"
+                      value="2"
+                      min="1"
+                      step="1"
+                      inputmode="numeric"
+                      required
+                    />
+                    <button
+                      type="button"
+                      id="btnIncrementPeople"
+                      class="stepper-btn"
+                      aria-label="Increase number of people"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Buttons: Calculate & Reset -->
+                <div class="form-actions">
+                  <button type="submit" id="btnCalculate" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                      <line x1="8" y1="6" x2="16" y2="6"></line>
+                      <line x1="16" y1="14" x2="16" y2="14.01"></line>
+                      <line x1="12" y1="14" x2="12" y2="14.01"></line>
+                      <line x1="8" y1="14" x2="8" y2="14.01"></line>
+                      <line x1="16" y1="18" x2="16" y2="18.01"></line>
+                      <line x1="12" y1="18" x2="12" y2="18.01"></line>
+                      <line x1="8" y1="18" x2="8" y2="18.01"></line>
+                    </svg>
+                    <span>Calculate Split</span>
+                  </button>
+                  <button type="button" id="btnReset" class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <polyline points="1 4 1 10 7 10"></polyline>
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                    <span>Reset</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Column 2: Results Display Panel -->
+        <section class="panel-card" id="outputPanel" aria-labelledby="resultsHeading">
+          <div class="panel-header">
+            <h2 class="panel-title" id="resultsHeading">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                <line x1="12" y1="6" x2="12" y2="8"></line>
+                <line x1="12" y1="16" x2="12" y2="18"></line>
+              </svg>
+              <span>Split Breakdown</span>
+            </h2>
+            <span class="panel-subtitle-tag" id="summaryStatusTag">Live Breakdown</span>
+          </div>
+
+          <div class="panel-body">
+            <!-- Empty State (Shown before calculation or after reset) -->
+            <div id="emptyState" class="empty-state">
+              <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <h3 class="empty-state-title">No Calculation Yet</h3>
+              <p class="empty-state-text">
+                Enter your occasion details and bill total on the left, then click <strong>Calculate Split</strong> to view each person's exact share.
+              </p>
+            </div>
+
+            <!-- Populated Results Container -->
+            <div id="resultsContainer" style="display: none;">
+              <!-- Occasion Header Summary -->
+              <div class="result-header-card">
+                <div class="occasion-summary-row">
+                  <div>
+                    <div class="occasion-name-label" id="resOccasionName">Dinner Party</div>
+                    <div class="occasion-meta" id="resOccasionDate">Today</div>
+                  </div>
+                  <span class="share-tag share-tag-adjusted">Active Split</span>
+                </div>
+
+                <!-- 2x2 Key Metric Strip -->
+                <div class="metrics-strip">
+                  <div class="metric-cell">
+                    <div class="metric-label">Total Bill</div>
+                    <div class="metric-value currency-amount highlight-terracotta" id="resTotalBill">$0.00</div>
+                    <div class="metric-sub">Receipt Total</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Party Size</div>
+                    <div class="metric-value" id="resNumPeople">0 people</div>
+                    <div class="metric-sub">Equal Splitters</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Base Share</div>
+                    <div class="metric-value currency-amount" id="resBaseShare">$0.00</div>
+                    <div class="metric-sub">Before Penny Balance</div>
+                  </div>
+                  <div class="metric-cell">
+                    <div class="metric-label">Penny Check</div>
+                    <div class="metric-value stat-number" style="font-size: 1rem; color: var(--sage);" id="resReconciledBadge">Exact match</div>
+                    <div class="metric-sub">100% Reconciled</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Individual Shares Table (Rule 2 & 3) -->
+              <div class="shares-table-wrap">
+                <table class="shares-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Person</th>
+                      <th scope="col">Allocation</th>
+                      <th scope="col" class="text-right">Share Due</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sharesTableBody">
+                    <!-- Dynamic Rows Rendered by script.js -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Penny Reconciliation Verification Card (Rule 3) -->
+              <div class="reconciliation-card">
+                <svg class="reconciliation-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <div class="reconciliation-body">
+                  <div class="reconciliation-header">
+                    <span class="reconciliation-title">Exact Penny Balance Verified</span>
+                    <span class="reconciliation-status">Sum = Bill (0¢ diff)</span>
+                  </div>
+                  <div class="reconciliation-math" id="resReconciliationMath">
+                    Shares sum exactly to the bill total.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Bar: Copy Summary & Print -->
+              <div class="result-actions">
+                <button type="button" id="btnCopySummary" class="btn btn-secondary btn-sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>Copy Summary</span>
+                </button>
+                <button type="button" id="btnPrint" class="btn btn-secondary btn-sm">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  <span>Print Receipt</span>
+                </button>
+                <span id="copyFeedback" class="copy-feedback" style="display: none;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Copied!</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Recent Splits History -->
+      <section class="history-section" id="historySection" style="display: none;" aria-labelledby="historyHeading">
+        <div class="history-header">
+          <h2 class="history-title" id="historyHeading">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Recent Saved Splits</span>
+          </h2>
+          <button type="button" id="btnClearHistory" class="btn btn-secondary btn-sm">Clear History</button>
+        </div>
+        <div class="history-grid" id="historyList">
+          <!-- Dynamic History Cards -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>FairShare · Exact Penny Bill Allocation & Splitter</div>
+        <div>Vanilla HTML5 · CSS3 · JavaScript</div>
+      </div>
+    </footer>
+
+    <!-- Vanilla Script -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
